@@ -36,7 +36,7 @@ void execute_command(char *cmd) {
         
         for (int j = 0; args[j] != NULL; j++) {
             if (strcmp(args[j], "<") == 0) {
-                // Open input file in read-only mode
+                
                 in_fd = open(args[j + 1], O_RDONLY);
                 if (in_fd < 0) {
                     perror("Error opening input file");
@@ -56,7 +56,7 @@ void execute_command(char *cmd) {
 
                 dup2(out_fd, STDOUT_FILENO);
                 close(out_fd);
-                args[j] = NULL;  // Remove ">" and filename from arguments
+                args[j] = NULL;  
             }
         }
 
