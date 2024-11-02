@@ -10,12 +10,12 @@
 
 void display_prompt() {
     printf("PUCITshell:- ");
-    fflush(stdout);  // Ensure prompt is displayed before input
+    fflush(stdout);  
 }
 
 void parse_command(char *input, char **args) {
     int i = 0;
-    args[i] = strtok(input, " \t\n");  // Split input into tokens
+    args[i] = strtok(input, " \t\n"); 
     while (args[i] != NULL) {
         i++;
         args[i] = strtok(NULL, " \t\n");
@@ -35,7 +35,7 @@ void execute_command(char **args) {
         exit(EXIT_FAILURE);
     } else {
         // Parent process
-        wait(NULL);  // Wait for the child process to complete
+        wait(NULL);  
     }
 }
 
@@ -52,7 +52,7 @@ int main() {
         parse_command(input, args);
         
         if (args[0] == NULL) {
-            continue;  // Empty command entered
+            continue;  
         }
         
         execute_command(args);
