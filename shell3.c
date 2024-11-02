@@ -10,7 +10,7 @@
 #define MAX_ARGS 10
 
 void handle_sigchld(int sig) {
-    // Reap all terminated child processes
+  
     while (waitpid(-1, NULL, WNOHANG) > 0);
 }
 
@@ -38,8 +38,8 @@ void parse_command(char *command, char **args, int *background) {
 void execute_single_command(char **args, int background, char *infile, char *outfile) {
     pid_t pid = fork();
 
-    if (pid == 0) { // Child process
-        // Handle input redirection
+    if (pid == 0) { 
+
         if (infile) {
             int fd_in = open(infile, O_RDONLY);
             if (fd_in < 0) { perror("Input file error"); exit(1); }
@@ -47,7 +47,7 @@ void execute_single_command(char **args, int background, char *infile, char *out
             close(fd_in);
         }
         
-        // Handle output redirection
+
         if (outfile) {
             int fd_out = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
             if (fd_out < 0) { perror("Output file error"); exit(1); }
@@ -59,11 +59,11 @@ void execute_single_command(char **args, int background, char *infile, char *out
             perror("Error executing command");
             exit(EXIT_FAILURE);
         }
-    } else if (pid > 0) { // Parent process
+    } else if (pid > 0) { 
         if (background) {
             printf("[%d] %d\n", getpid(), pid);
         } else {
-            waitpid(pid, NULL, 0); // Wait for foreground process to finish
+            waitpid(pid, NULL, 0); 
         }
     } else {
         perror("Fork failed");
@@ -75,16 +75,16 @@ void handle_pipes_and_redirection(char *command) {
     int background = 0;
     char *infile = NULL, *outfile = NULL;
     
-    // Check for pipes
+  
     char *cmd1 = strtok(command, "|");
     char *cmd2 = strtok(NULL, "|");
 
-    if (cmd2) { // Handle piping
+    if (cmd2) { 
         int pipefd[2];
         pipe(pipefd);
 
-        if (fork() == 0) { // First child for cmd1
-            dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe
+        if (fork() == 0) { 
+            dup2(pipefd[1], STDOUT_FILENO); 
             close(pipefd[0]);
             close(pipefd[1]);
 
@@ -94,8 +94,8 @@ void handle_pipes_and_redirection(char *command) {
             exit(EXIT_FAILURE);
         }
 
-        if (fork() == 0) { // Second child for cmd2
-            dup2(pipefd[0], STDIN_FILENO); // Redirect stdin to pipe
+        if (fork() == 0) { 
+            dup2(pipefd[0], STDIN_FILENO);
             close(pipefd[1]);
             close(pipefd[0]);
 
@@ -110,7 +110,7 @@ void handle_pipes_and_redirection(char *command) {
         wait(NULL);
         wait(NULL);
         
-    } else { // Handle I/O redirection
+    } else { 
         char *input = strstr(command, "<");
         char *output = strstr(command, ">");
         
@@ -133,7 +133,7 @@ int main() {
     char *args[MAX_ARGS];
     int background;
 
-    // Set up signal handler for SIGCHLD to avoid zombies
+
     struct sigaction sa;
     sa.sa_handler = handle_sigchld;
     sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
@@ -143,16 +143,16 @@ int main() {
     while (1) {
         display_prompt();
 
-        // Read command input
+       
         if (fgets(command, sizeof(command), stdin) == NULL) {
             printf("\nExiting shell...\n");
             break; // Exit on <CTRL+D>
         }
 
-        // Remove newline character
+      
         command[strcspn(command, "\n")] = '\0';
 
-        // Handle pipes and redirection
+       
         handle_pipes_and_redirection(command);
     }
 
